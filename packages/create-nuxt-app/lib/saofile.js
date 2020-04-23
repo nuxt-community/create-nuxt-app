@@ -27,7 +27,18 @@ module.exports = {
     const { cliOptions = {} } = this.sao.opts
     const edge = cliOptions.edge ? '-edge' : ''
 
+    const ifTrue = (condition, content, elseContent) => condition ? content : elseContent || ''
+    const generateComponent = (imports, componentOptions) => {
+      return `
+<script ${ifTrue(typescript, 'lang="ts"')}>
+${ifTrue(typescript, 'import Vue from \'vue\'')}
+${ifTrue(!!imports, imports, '\r\n')}
+export default ${ifTrue(typescript, 'Vue.extend(' + componentOptions + ')', componentOptions)}
+</script>`
+    }
+
     return {
+      generateComponent,
       typescript,
       tsRuntime,
       pwa,
@@ -45,22 +56,28 @@ module.exports = {
   },
   actions () {
     const validation = validate(this.answers.name)
-    validation.warnings && validation.warnings.forEach((warn) => {
-      console.warn('Warning:', warn)
-    })
-    validation.errors && validation.errors.forEach((err) => {
-      console.error('Error:', err)
-    })
+    validation.warnings &&
+      validation.warnings.forEach((warn) => {
+        console.warn('Warning:', warn)
+      })
+    validation.errors &&
+      validation.errors.forEach((err) => {
+        console.error('Error:', err)
+      })
     validation.errors && validation.errors.length && process.exit(1)
 
-    const actions = [{
-      type: 'add',
-      files: '**',
-      templateDir: join(templateDir, 'nuxt'),
-      filters: {
-        'static/icon.png': 'features.includes("pwa")'
+    const actions = [
+      {
+        type: 'add',
+        files: '**',
+        templateDir: join(templateDir, 'nuxt'),
+        filters: {
+          'static/icon.png': 'features.includes("pwa")',
+          'nuxt.config.ts': 'runtime && runtime.includes("ts-runtime")',
+          'nuxt.config.js': '!runtime || !runtime.includes("ts-runtime")'
+        }
       }
-    }]
+    ]
 
     if (this.answers.ui !== 'none') {
       actions.push({
@@ -112,6 +129,7 @@ module.exports = {
         '_.prettierrc': 'linter.includes("prettier")',
         '_jsconfig.json': 'devTools.includes("jsconfig.json")',
         'tsconfig.json': 'language.includes("ts")',
+        'vue-shims.d.ts': 'language.includes("ts")',
         'semantic.yml': 'devTools.includes("semantic-pull-requests")',
         '.env': 'features.includes("dotenv")',
         '_stylelint.config.js': 'linter.includes("stylelint")'
@@ -177,7 +195,9 @@ module.exports = {
     const cdMsg = isNewFolder ? chalk`\t{cyan cd ${relativeOutFolder}}\n` : ''
     const pmRun = this.answers.pm === 'yarn' ? 'yarn' : 'npm run'
 
-    console.log(chalk`\n🎉  {bold Successfully created project} {cyan ${this.answers.name}}\n`)
+    console.log(
+      chalk`\n🎉  {bold Successfully created project} {cyan ${this.answers.name}}\n`
+    )
 
     console.log(chalk`  {bold To get started:}\n`)
     console.log(chalk`${cdMsg}\t{cyan ${pmRun} dev}\n`)
@@ -192,7 +212,9 @@ module.exports = {
     }
 
     if (this.answers.language.includes('ts')) {
-      console.log(chalk`\n  {bold For TypeScript users.} \n\n  See : https://typescript.nuxtjs.org/cookbook/components/`)
+      console.log(
+        chalk`\n  {bold For TypeScript users.} \n\n  See : https://typescript.nuxtjs.org/cookbook/components/`
+      )
     }
   }
 }

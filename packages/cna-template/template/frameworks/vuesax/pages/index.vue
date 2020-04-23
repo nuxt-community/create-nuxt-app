@@ -61,17 +61,15 @@
   </div>
 </template>
 
-<script>
-import Logo from '~/components/Logo.vue'
-import VuesaxLogo from '~/components/VuesaxLogo.vue'
-
-export default {
+<%- generateComponent(`
+  import Logo from '~/components/Logo.vue'
+  import VuesaxLogo from '~/components/VuesaxLogo.vue'
+`,`{
   components: {
     Logo,
     VuesaxLogo
   }
-}
-</script>
+}`)%>
 
 <style>
 .container {

@@ -88,8 +88,7 @@
   </v-app>
 </template>
 
-<script>
-export default {
+<%- generateComponent(``,`{
   data () {
     return {
       clipped: false,
@@ -113,5 +112,4 @@ export default {
       title: 'Vuetify.js'
     }
   }
-}
-</script>
+}`) %>

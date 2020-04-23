@@ -1,21 +1,14 @@
-<%_ if (esm) { _%>
-  <%_ if (ui === 'vuetify') { _%>
+
+import { Configuration } from '@nuxt/types'
+
+<%_ if (ui === 'vuetify') { _%>
 import colors from 'vuetify/es5/util/colors'
-  <%_ } _%>
-<%_ } else { _%>
-  <%_ if (server === 'adonis') { _%>
-const { resolve } = require('path')
-  <%_ } _%>
-  <%_ if (ui === 'vuetify') { _%>
-const colors = require('vuetify/es5/util/colors').default
-  <%_ } _%>
+<%_ } _%>
+<%_ if (server === 'adonis') { _%>
+  import { resolve } from 'path'
 <%_ } _%>
 
-<%_ if (esm) { _%>
-export default {
-<%_ } else { _%>
-module.exports = {
-<%_ } _%>
+const config: Configuration = {
   mode: '<%= mode %>',
   <%_ if (server === 'adonis') { _%>
   dev: process.env.NODE_ENV === 'development',
@@ -62,7 +55,7 @@ module.exports = {
     <%_ } else if (ui === 'tachyons') { _%>
     'tachyons/css/tachyons.css'
     <%_ } else if (ui === 'framevuerk') { _%>
-    'framevuerk/dist/framevuerk-nuxt.min.css'
+      'framevuerk/dist/framevuerk-nuxt.min.css'
     <%_ } else if (ui === 'vuesax') { _%>
     'vuesax/dist/vuesax.css'
     <%_ } _%>
@@ -86,11 +79,12 @@ module.exports = {
   /*
   ** Nuxt.js dev-modules
   */
+
   buildModules: [
     <%_ if (typescript) {_%>
     '@nuxt/typescript-build',
     <%_ } _%>
-    <%_ if (eslint && !typescript) { _%>
+    <%_ if (eslint) { _%>
     // Doc: https://github.com/nuxt-community/eslint-module
     '@nuxtjs/eslint-module',
     <%_ } _%>
@@ -184,3 +178,5 @@ module.exports = {
     }
   }
 }
+
+export default config;

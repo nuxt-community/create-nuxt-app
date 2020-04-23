@@ -12,8 +12,7 @@
   </v-app>
 </template>
 
-<script>
-export default {
+<%- generateComponent(``,`{
   layout: 'empty',
   props: {
     error: {
@@ -34,8 +33,7 @@ export default {
       title
     }
   }
-}
-</script>
+}`) %>
 
 <style scoped>
 h1 {

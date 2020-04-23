@@ -26,9 +26,9 @@ const verifyPkg = async (t, answers = {}) => {
   t.snapshot(getPkgFields(pkg), 'package.json')
 }
 
-const verifyNuxtConfig = async (t, answers = {}) => {
+const verifyNuxtConfig = async (t, answers = {}, typescript) => {
   const stream = await sao.mock({ generator }, answers)
-  const configFile = answers.server === 'adonis' ? 'config/nuxt.js' : 'nuxt.config.js'
+  const configFile = answers.server === 'adonis' ? 'config/nuxt.js' : `nuxt.config.${typescript ? 'ts' : 'js'}`
   const config = await stream.readFile(configFile)
   t.snapshot(normalizeNewlines(config), `Generated ${configFile}`)
 }
@@ -46,7 +46,17 @@ for (const prompt of saoConfig.prompts) {
         const answer = { [prompt.name]: prompt.type === 'checkbox' ? [choice.value] : choice.value }
         await verifyFileList(t, answer)
         await verifyPkg(t, answer)
-        await verifyNuxtConfig(t, answer)
+        await verifyNuxtConfig(t, answer, false)
+
+        // runtime has a "when" filter on it, make sure we setup answers correctly to satisfy it and run tests again
+        if (prompt.name === 'runtime' && choice.name.includes('typescript')) {
+          answer.language = 'ts'
+          answer.server = 'none'
+
+          await verifyFileList(t, answer)
+          await verifyPkg(t, answer)
+          await verifyNuxtConfig(t, answer, true)
+        }
       })
     }
   }
